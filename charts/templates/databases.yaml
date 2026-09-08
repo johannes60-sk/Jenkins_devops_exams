@@ -1,0 +1,101 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: movie-db
+spec:
+  selector:
+    app: movie-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: movie-db
+spec:
+  serviceName: movie-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app: movie-db
+  template:
+    metadata:
+      labels:
+        app: movie-db
+    spec:
+      containers:
+        - name: postgres
+          image: "{{ .Values.images.postgres.repository }}:{{ .Values.images.postgres.tag }}"
+          imagePullPolicy: {{ .Values.images.postgres.pullPolicy }}
+          env:
+            - name: POSTGRES_USER
+              value: {{ .Values.databases.movie.user | quote }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.databases.movie.password | quote }}
+            - name: POSTGRES_DB
+              value: {{ .Values.databases.movie.name | quote }}
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: movie-data
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: movie-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cast-db
+spec:
+  selector:
+    app: cast-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cast-db
+spec:
+  serviceName: cast-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cast-db
+  template:
+    metadata:
+      labels:
+        app: cast-db
+    spec:
+      containers:
+        - name: postgres
+          image: "{{ .Values.images.postgres.repository }}:{{ .Values.images.postgres.tag }}"
+          imagePullPolicy: {{ .Values.images.postgres.pullPolicy }}
+          env:
+            - name: POSTGRES_USER
+              value: {{ .Values.databases.cast.user | quote }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.databases.cast.password | quote }}
+            - name: POSTGRES_DB
+              value: {{ .Values.databases.cast.name | quote }}
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: cast-data
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: cast-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
