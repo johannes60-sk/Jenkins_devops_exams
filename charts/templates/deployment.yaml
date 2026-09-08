@@ -25,10 +25,10 @@ spec:
               value: "http://cast-service:8000/api/v1/casts/"
           ports:
             - containerPort: 8000
-                    readinessProbe:
-          httpGet:
-            path: /api/v1/movies/docs
-            port: 8000
-          initialDelaySeconds: 2
-          periodSeconds: 2
-          failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /api/v1/movies/docs
+              port: 8000
+            initialDelaySeconds: 2
+            periodSeconds: 2
+            failureThreshold: 30
