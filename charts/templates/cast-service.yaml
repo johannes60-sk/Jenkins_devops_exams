@@ -35,3 +35,10 @@ spec:
   ports:
     - port: 8000
       targetPort: 8000
+      readinessProbe:
+      httpGet:
+        path: /api/v1/casts/docs
+        port: 8000
+      initialDelaySeconds: 2
+      periodSeconds: 2
+      failureThreshold: 30
